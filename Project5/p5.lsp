@@ -1,5 +1,5 @@
 ; Sohrab Kazak
-; Mar. 12 2024
+; Mar. 24 2024
 ; CS461 | Project 5
 
 ; Defining rules for states in Missionaries And Cannibals
@@ -58,26 +58,24 @@
             ; ; Boat is not R or L
                 ((t "State:Boat:Invalid")))) 
             possible-actions ) #'is-valid) ; Trim list against the is-valid function
-    )
-    ;Else
+    ) ; Else
     "State:Invalid" ))
 
 (defun set-no-backtracking (node route)
-    (if (member node route :test #'equal) route (setq route (append route (list node))))
-)
+; Check against existing nodes and add to route if unqiue 
+    (if (member node route :test #'equal) route (setq route (append route (list node)))))
 
-(defun mac-helper (start quene route end)
-    (let ((expanded-current (mac-next start))
-          (something 0))
-        ; (print expanded-current)
-        (if (not (member start route :test #'equal)) (setq route (append route (list start))))
-        (if (not (equal start end)) 
-            ; (print quene)
-            (mac-helper (car expanded-current) quene route end)
-        )
-    )
-)
+(defun mac-helper (start end mac-next)
+    ; (format t "~A~%" start)
+    (cond ((equal start end) (list start))
+          (t (let ((successors (mac-next start)))
+                (dolist (next successors)
+                    (format T "~A~%" next)
+                    ; Gets the next sucessor but recurs infinitly 
+                    (achieve-when-let ((path (mac-helper next end mac-next)))
+                        (cons start path)))
+                        
+            ))))
 
 (defun mac (start end)
-    (mac-helper start nil nil end)
-)
+    (mac-helper start end #'mac-next))
